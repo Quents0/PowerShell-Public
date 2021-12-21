@@ -1,28 +1,33 @@
-﻿Import-Module ActiveDirectory
-Write-Host "Liste des répertoires d'utilisateurs absents"
+﻿#Initialisation
+Import-Module ActiveDirectory
+Write-Host "Liste des répertoires personnels d'utilisateurs supprimés"
 
 #Chemin des répertoires utilisateurs
-$Path = "\\SERVEUR\EMPLACEMENT"
+$Emplacement = "\\SERVEUR\EMPLACEMENT"
 
-#Attribuer la liste des dossiers à une variable
-$Liste_dossiers = Get-ChildItem -Path $Path | Select-Object Name
+#Attribuer la liste des dossiers utilisateurs à une variable
+$ListeDossiers = Get-ChildItem -Path $Emplacement | Select-Object Name
 
-foreach ($dossier in $Liste_dossiers)
+#Pour chaque dossier utilisateur dans la liste des dossiers
+foreach ($Dossier in $ListeDossiers)
 {
 	# Initialisation de la variable $account pour chaque ligne
-	$account = $null
+	$Compte = $null
 
 	# Récupération du nom du dossier dans la ligne traitée
-	$rep = $dossier.Name
+	$Rep = $Dossier.Name
 
 	# Vérification de l'existence ou non du compte
-	try { $account = Get-ADUser $rep }
+	try { $Compte = Get-ADUser $Rep }
 	catch {}
 
-	# Teste si le compte existe et qu'il est égal au nom du dossier
-	if ($account."SamAccountName" -ne $rep)
+	# Si le compte testé ne revois rien et que donc le nom ne correspond pas
+	if ($Compte."SamAccountName" -ne $Rep)
 	{
 		# Le compte n'existe pas dans l'AD
-		Write-Host "$Path\$rep"
+		Write-Host "$Emplacement\$Rep"
+
+        #Supprimer le dossier
+        #Remove-Item -Path "$Emplacement\$Rep" -Force        
 	}
 }
